@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Mythic GME</title>
+	<script src="general.js"></script>
+	<script src="FileSaver.js"></script>
+	<link rel="stylesheet" type="text/css" href="mythic.css">
+</head>
+<body onload="initLoad();">
+<div class="titleContainer">
+<h1>Mythic Game Master Emulator</h1>
+<p class="legal_msg">Mythic GME is copyright 2022 Tana Pigeon and <a href="https://www.wordmillgames.com/" target="_blank">Word Mill Games</a>. Purchase the Mythic GME book <a href="https://www.drivethrurpg.com/product/20798/Mythic-Game-Master-Emulator" target="_blank">here</a>, and other Word Mill Games products <a href="https://www.drivethrurpg.com/browse/pub/480/Word-Mill" target="_blank">here</a>.  You can also <a href="https://www.patreon.com/wordmillgames/membership" target="_blank">support Tana Pigeon on Patreon</a>.</p>
+</div>
+<div id="theLogDiv">
+	<div class="halfWidthContainer" style="width:58%">
+		<h2>The Adventure Log</h2>
+		<textarea id="theLog" type="text" class="theLogClass"></textarea>
+	</div>
+	<div class="halfWidthContainer" id="helperArea" style="width:38%">
+		<div class="tab">
+			<button class="tablinks" onclick="openTab(event,'adventureDIV')" id="adventureTabBtn">Adventure</button>
+			<button class="tablinks" onclick="openTab(event,'sceneAndFateDIV')">Checks</button>
+			<button class="tablinks" onclick="openTab(event,'npcHelperDIV')">NPCs</button>
+			<button class="tablinks" onclick="openTab(event,'pcHelperDIV')">PCs</button>
+			<button class="tablinks" onclick="openTab(event,'threadHelperDIV')">Threads</button>
+		</div>
+		<div id="adventureDIV" class="mechanicContainer" name="helperDIV">
+			<label for="savedAdventureList" class="infoLabel">Saved Adventure List:</label>
+			<select id="savedAdventureList"></select>
+			<div class="invisibleContainer">
+				<p class="infoLabel">Adventure Name:</p>
+				<input class="displayBox" id="adventureName" onchange="theAdventureLog.name = this.value;" value="My Adventure"/>
+			</div>
+			<div class="invisibleContainer">
+				<button onclick="newAdventure();">New</button>		
+				<button onclick="saveAdventure();">Save</button>
+				<button onclick="loadAdventure();">Load</button>
+				<button onclick="delAdventure();">Delete</button>
+				<button onclick="delAllAdventures();">Delete ALL</button>
+				<button onclick="exportAdventure();">Export</button>
+				<label for="import_adventure" class="infoLabel">Import a file: </label>
+				<input onchange="importAdventure(this);" type="file" accept="json" id="import_adventure"/ >
+			</div>
+		</div>
+		<div id="sceneAndFateDIV" class="mechanicContainer" name="helperDIV">
+			<div class="invisibleContainer">
+				<p class="infoLabel">Current Chaos Factor:</p>
+				<select id="ChaosFactor" class="displayBox" onchange="theAdventureLog.chaosFactor = parseInt(this.value);">
+					<option>1</option>
+					<option>2</option>
+					<option>3</option>
+					<option>4</option>
+					<option>5</option>
+					<option>6</option>
+					<option>7</option>
+					<option>8</option>
+					<option>9</option>
+				</select>
+			</div>
+			<div class="invisibleContainer">
+				<p class="infoLabel">Type Scene Idea into Adventure Log and press:</p>
+				<button onclick="sceneSetup();">Scene Setup</button>			
+			</div>
+			<div class="invisibleContainer">
+				<p class="infoLabel">Fate Check odds:</p>
+				<select id="fateCheckOdds" class="displayBox"></select>
+				<button onclick="fateCheck();" >Fate Check</button><br />
+				<button onclick="randomEvent();" style="margin-top:0.3em;">Event Check</button>
+				<button onclick="detailCheck();">Detail Check</button>
+			</div>
+			<div class="invisibleContainer" style="padding-top:0.3em;">
+				<button onclick="description();">Descriptor Table</button>
+				<button onclick="action();">Action Table</button><br />
+				<select class="displayBox" name="elements"></select>&nbsp;<button onclick="elementDesc(0);">Go</button>
+				<select class="displayBox" name="elements"></select>&nbsp;<button onclick="elementDesc(1);">Go</button>
+				<select class="displayBox" name="elements"></select>&nbsp;<button onclick="elementDesc(2);">Go</button>
+				<select class="displayBox" name="elements"></select>&nbsp;<button onclick="elementDesc(3);">Go</button>
+				<select class="displayBox" name="elements"></select>&nbsp;<button onclick="elementDesc(4);">Go</button>
+				<select class="displayBox" name="elements"></select>&nbsp;<button onclick="elementDesc(5);">Go</button>
+			</div>
+			<div id="DiceDIV" class="invisibleContainer" style="padding-top:0.3em;">
+				<button onclick="diceFn(d100, 1, 'd100');">d100</button>
+				<button onclick="diceFn(d20, 1, 'd20');">d20</button>
+				<button onclick="diceFn(d12, 1, 'd12');">d12</button>
+				<button onclick="diceFn(d10, 1, 'd10');">d10</button>
+				<button onclick="diceFn(d8, 1, 'd8');">d8</button>
+				<button onclick="diceFn(d6, 1, 'd6');">d6</button>
+				<button onclick="diceFn(d4, 1, 'd4');">d4</button>
+				<button onclick="diceFn(d10, 2, '2d10');">2d10</button>
+				<button onclick="diceFn(d6, 2, '2d6');">2d6</button>		
+				<button onclick="diceFn(d66, 1, 'd66');">d66</button>
+			</div>
+		</div>
+		<div id="npcHelperDIV" class="mechanicContainer" name="helperDIV" style="display:none;">
+			<div class="invisibleContainer">
+				<p class="infoLabel">NPC List:</p>
+				<select id="characterList" class="displayBox" onchange="theAdventureLog.editCharacter();"></select>
+				<button onclick="theAdventureLog.delCharacter();">Delete</button>
+				<button onclick="theAdventureLog.randomCharacter();">Random</button>
+				<button onclick="theAdventureLog.addCharacter();">Add</button>
+			</div>
+			<div class="invisibleContainerFlex">
+				<div class="miniHelper">
+					<p class="infoLabel">Name:</p>
+					<input class="displayBox" id="charName"/>
+				</div>
+				<div class="miniHelper">
+					<p class="infoLabel">Description:</p>
+					<input class="displayBox" id="charDesc"/>
+				</div>
+			</div>
+			<div class="invisibleContainer" id="behaviourCheckDIV">
+				<p class="infoLabel" id="dispositionLabel" >Disposition:</p>
+				<input class="displayBox" id="dispositionValue" type="number" min="0" max="20"/>&nbsp;<span class="displayBox" id="dispositionDescription">None</span>
+				<button onclick="theAdventureLog.behaviourCheck();" title="From Mythic Variations 2">Behaviour Check</button>
+				<p class="infoLabel" id="identityDescLabel" >Identity Descriptor:</p>
+				<input class="displayBox" id="identityDesc" />&nbsp;
+				<select class="displayBoxNarrow" id="idActivation" ><option value="2">Active</option><option value="0" selected>Neutral</option><option value="-2">Passive</option></select>
+				<p class="infoLabel" id="persDescLabel" >Personality Descriptor:</p>
+				<input class="displayBox" id="persDesc"   />&nbsp;
+				<select class="displayBoxNarrow" id="persActivation" ><option value="2">Active</option><option value="0" selected>Neutral</option><option value="-2">Passive</option></select>
+				<p class="infoLabel" id="actDescLabel" >Activity Descriptor:</p>
+				<input class="displayBox" id="actDesc"   />&nbsp;
+				<select class="displayBoxNarrow" id="actActivation" ><option value="2">Active</option><option value="0" selected>Neutral</option><option value="-2">Passive</option></select>
+			</div>
+			<div class="invisibleContainer">
+				<p class="infoLabel">Notes</p>
+				<textarea id="characterNotes" type="text" ></textarea>
+			</div>
+		</div>
+		<div class="mechanicContainer" id="pcHelperDIV" name="helperDIV" style="display:none;">
+			<div class="invisibleContainer">
+				<p class="infoLabel">PC List:</p>
+				<select id="pcList" class="displayBox" onchange="theAdventureLog.editPC();"></select>
+				<button onclick="theAdventureLog.delPC();">Delete</button>
+				<button onclick="theAdventureLog.randomPC();">Random</button>
+				<button onclick="theAdventureLog.addPC();">Add</button>
+			</div>
+			<div class="invisibleContainer">
+				<p class="infoLabel">Name:</p>
+				<input class="displayBox" id="pcName"/>
+			</div>
+			<div class="invisibleContainer">
+				<p class="infoLabel">Description:</p>
+				<input class="displayBox" id="pcDesc"/>
+			</div>
+			<div class="invisibleContainer">
+				<p class="infoLabel">Notes</p>
+				<textarea id="pcNotes"></textarea>
+			</div>
+		
+		</div>
+		<div class="mechanicContainer" id="threadHelperDIV" name="helperDIV" style="display:none;">
+			<div class="invisibleContainer">
+				<p class="infoLabel">Thread List:</p>
+				<select id="threadList" class="displayBox" onchange="theAdventureLog.editThread();"></select>
+				<button onclick="theAdventureLog.randomThread();">Random</button>
+				<button onclick="theAdventureLog.addThread();">Add</button>
+			</div>
+			<div class="invisibleContainer">
+				<p class="infoLabel">Name:</p>
+				<input class="displayBox" id="threadDetName"/> <input type="checkbox" id="threadClosed" onchange="theAdventureLog.closeThread();"/> 
+				<label for="threadClosed" class="infoLabel">Closed</label>
+			</div>
+			<div class="invisibleContainer">
+				<p class="infoLabel">Description:</p>
+				<input class="displayBox" id="threadDetDesc"/>
+			</div>
+			<div class="invisibleContainer">
+				<p class="infoLabel">Notes</p>
+				<textarea id="threadNotes"></textarea>
+			</div>
+		</div>
+	</div>
+</div>
+
+</body>
+</html>
